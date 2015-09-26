@@ -1,0 +1,21 @@
+#title{
+	position:absolute;
+}
+
+#layout1{
+	position:absolute;
+}
+#layout2{
+	position:absolute;
+	z-index:10;
+}
+
+
+canvas#minimap {
+	background-color: rgb(100,100,100);
+}
+
+body{
+	height:auto;
+	background-color:rgb(142,194,251);
+}
