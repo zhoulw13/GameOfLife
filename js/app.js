@@ -63,7 +63,7 @@ function gameCycle(){
 	changedCells = [];
 	previousLiveCells = currentLiveCells.slice();
 	currentLiveCells.splice(0, currentLiveCells.length);
-	console.log(previousLiveCells.length);
+	//console.log(previousLiveCells.length);
 	if (gameStop === false)
 		setTimeout(gameCycle, timeout);
 }
