@@ -1,3 +1,4 @@
+//some global variable
 var timeout = 200;
 var miniMapScale = 15;
 var width = 40;
@@ -6,7 +7,6 @@ var margin = 5;
 var realWidth = width+2*margin;
 var realHeight = height+2*margin;
 var map = new Array(realWidth);
-//var currentMap = new Array(realWidth);
 var previousLiveCells = [];
 var currentLiveCells = []
 var changedCells = [];
@@ -15,10 +15,8 @@ var gameStop = true;
 function init(){
 	for (var i = 0; i < realWidth; i++){
 		map[i] = new Array(realHeight);
-		//currentMap[i] = new Array(realHeight);
 		for (var j = 0; j < realHeight; j++){
 			map[i][j] = 0;
-			//currentMap[i][j] = 0;
 		}
 	}
 	drawInitMap();
@@ -63,7 +61,6 @@ function gameCycle(){
 }
 
 function updateMap(){
-	//currentMap = map;
 	var length = previousLiveCells.length;
 	for (var i = 0; i < length; i++){
 		var x = previousLiveCells[i][0];
@@ -129,7 +126,6 @@ function updateCell(surround, x, y){
 		sum += map[x+surround[i][0]][y+surround[i][1]];
 		if (map[x][y] == 1){
 			if (map[x+surround[i][0]][y+surround[i][1]] == 0){
-				//deadCells[deadCells.length] = [x+surround[i][0], y+surround[i][1]];
 				nineCellCases(x+surround[i][0], y+surround[i][1]);
 			}
 		}
@@ -162,20 +158,18 @@ function updateCell(surround, x, y){
 
 function drawInitMap(){
 	var miniMap = $("#minimap")[0];
-	miniMap.width = width * miniMapScale + 1;	// resize the internal canvas dimensions 
+	miniMap.width = width * miniMapScale + 1;
 	miniMap.height = height * miniMapScale + 1;
 	var cxt = miniMap.getContext("2d");
 	cxt.strokeStyle = "rgba(200,200,200,1)";
 	for (var x=0;x<=width;x++) {
 		cxt.moveTo(x * miniMapScale,0);
 		cxt.lineTo(x * miniMapScale, height * miniMapScale);
-		//cxt.fill();
 		cxt.stroke();
 	}
 	for (var y=0;y<=height;y++) {
 		cxt.moveTo(0, y * miniMapScale);
 		cxt.lineTo(width * miniMapScale, y * miniMapScale);
-		//cxt.fill();
 		cxt.stroke();
 	}
 }
@@ -227,7 +221,6 @@ function multiDimArraySearch(x, y, a){
 function adjustScreen(){
 	var layout1 = $("#layout1");
 	var layout2 = $("#layout2");
-	//var buttonList = $("#buttonList");
 	var left = 	(document.body.clientWidth - width * miniMapScale - 1) / 2;
 	var titleLeft = (document.body.clientWidth - 380 - 1) / 2;
 	var top = "15%";
@@ -238,7 +231,6 @@ function adjustScreen(){
 	$('#title').css('left', titleLeft);
 	$('#title').css('top', "3%");
 	var tops = window.screen.height * 1;
-	//buttonList.css("top", tops+height*miniMapScale+1+"px");
 }
 
 window.onresize = adjustScreen;
