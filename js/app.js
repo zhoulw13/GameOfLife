@@ -12,6 +12,7 @@ var currentLiveCells = []
 var changedCells = [];
 var gameStop = true;
 
+//initialization operation
 function init(){
 	for (var i = 0; i < realWidth; i++){
 		map[i] = new Array(realHeight);
@@ -28,6 +29,7 @@ function init(){
 	speed.on('input', speedListener);
 }
 
+//Listener to start/stop
 function control(){
 	if(gameStop === true){
 		gameStop = false;
@@ -39,6 +41,7 @@ function control(){
 	}
 }
 
+//kill all cells
 function clearCells(){
 	for (var i = 0; i < realWidth; i++){
 		for (var j = 0; j < realHeight; j++){
@@ -49,6 +52,11 @@ function clearCells(){
 	drawCells();	
 }
 
+/*
+	Game's Main Cycle
+	including:update data in Map and living cells lists 
+			draw living cells in next round
+*/
 function gameCycle(){
 	updateMap();
 	drawCells();
@@ -59,6 +67,7 @@ function gameCycle(){
 	if (gameStop === false)
 		setTimeout(gameCycle, timeout);
 }
+
 
 function updateMap(){
 	var length = previousLiveCells.length;
@@ -73,7 +82,8 @@ function updateMap(){
 	}
 }
 
-//9 different cell cases
+//9 different cell's position cases
+//considering condition is different at the border
 function nineCellCases(x, y){
 	switch(x){
 	case 0:
@@ -118,6 +128,8 @@ function nineCellCases(x, y){
 	}
 }
 
+//counting living cells around cell (x,y) and decide 
+//whether it's dead or alive in next round
 function updateCell(surround, x, y){
 	var length = surround.length;
 	var sum = 0;
@@ -156,6 +168,7 @@ function updateCell(surround, x, y){
 	}
 }
 
+//draw background and lines in the beginning
 function drawInitMap(){
 	var miniMap = $("#minimap")[0];
 	miniMap.width = width * miniMapScale + 1;
@@ -174,6 +187,7 @@ function drawInitMap(){
 	}
 }
 
+//every round we will redraw all the live cells
 function drawCells(){
 	var cells = $('#cells')[0];
 	cells.width = width * miniMapScale + 1;	
@@ -193,6 +207,7 @@ function drawCells(){
 	}
 }
 
+//listener on the mouse click event and changing the status of a cell
 function changeCellStatus(){
 	var e=arguments[0]||window.event;
     var x = parseInt((e.pageX - $('#layout2').offset().left)/miniMapScale)+margin;
@@ -209,6 +224,7 @@ function changeCellStatus(){
 	drawCells();
 }
 
+//search an item in a two D array
 function multiDimArraySearch(x, y, a){
 	var length = a.length;
 	for (var i = 0; i<length; i++){
@@ -218,6 +234,9 @@ function multiDimArraySearch(x, y, a){
 	return -1;
 }
 
+
+//setting on elements's position so that it can fit 
+// screens with different resolution
 function adjustScreen(){
 	var layout1 = $("#layout1");
 	var layout2 = $("#layout2");
@@ -235,6 +254,7 @@ function adjustScreen(){
 
 window.onresize = adjustScreen;
 
+//listener on the speed dial and setting the time interval
 function speedListener(){
 	var speed = $('#speed');
 	timeout = 1000 - parseInt(speed.val());
