@@ -59,10 +59,10 @@ function clearCells(){
 */
 function gameCycle(){
 	updateMap();
-	drawCells();
 	changedCells = [];
 	previousLiveCells = currentLiveCells.slice();
 	currentLiveCells.splice(0, currentLiveCells.length);
+	drawCells();
 	//console.log(previousLiveCells.length);
 	if (gameStop === false)
 		setTimeout(gameCycle, timeout);
