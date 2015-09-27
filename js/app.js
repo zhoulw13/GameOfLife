@@ -1,7 +1,7 @@
 //some global variable
 var timeout = 200;
 var miniMapScale = 15;
-var width = 40;
+var width = 50;
 var height = 30;
 var margin = 5;
 var realWidth = width+2*margin;
@@ -196,11 +196,13 @@ function drawCells(){
 	cxt.fillStyle = "rgb(255,0,0)";
 	var length = previousLiveCells.length;
 	for (var i = 0; i < length; i++){
-		cxt.fillRect(
-			(previousLiveCells[i][0]-margin) * miniMapScale+1,
-			(previousLiveCells[i][1]-margin) * miniMapScale+1,
-			miniMapScale-2,miniMapScale-2
-		);
+		if (previousLiveCells[i][0] >= margin && previousLiveCells[i][1] >= margin){
+			cxt.fillRect(
+				(previousLiveCells[i][0]-margin) * miniMapScale+1,
+				(previousLiveCells[i][1]-margin) * miniMapScale+1,
+				miniMapScale-2,miniMapScale-2
+			);
+		}
 	}
 	if (length == 0){
 		cxt.clearRect(0,0, width*miniMapScale, height*miniMapScale);
