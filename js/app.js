@@ -92,7 +92,7 @@ function nineCellCases(x, y){
 			updateCell([[1, 0], [0, 1], [1, 1]], x, y);
 			break;
 		case realHeight-1: // 2
-			updateCell([[-1, 0], [0, -1], [-1, -1]], x, y);
+			updateCell([[1, 0], [0, -1], [1, -1]], x, y);
 			break;
 		default: // 3
 			updateCell([[0, -1], [1, -1], [1, 0], [1, 1], [0, 1]], x, y);

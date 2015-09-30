@@ -10,17 +10,18 @@ function test(){
 	gameCycle();
 	gameStop = true;
 	var end = window.performance.now()
-	alert(end-start);*/
+	alert(end-start);
+	*/
 }
 
 // test 1
 // every cell was alive at beginning and we will test the time game run a round
 // result:~5ms
 function everyoneAlive(){
-	for (var i = 0; i < width; i++){
-		for (var j = 0; j < height; j++){
-			map[i+margin][j+margin] = 1;
-			previousLiveCells[previousLiveCells.length] = [i+margin, j+margin];
+	for (var i = 0; i < realWidth; i++){
+		for (var j = 0; j < realHeight; j++){
+			map[i][j] = 1;
+			previousLiveCells[previousLiveCells.length] = [i, j];
 		}
 	}
 }
