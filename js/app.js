@@ -3,7 +3,7 @@ var timeout = 200;
 var miniMapScale = 15;
 var width = 50;
 var height = 30;
-var margin = 5;
+var margin = 10;
 var realWidth = width+2*margin;
 var realHeight = height+2*margin;
 var map = new Array(realWidth);
@@ -12,44 +12,76 @@ var currentLiveCells = []
 var changedCells = [];
 var gameStop = true;
 
+// extended variable
+var liveProbability = 0.1;
+var surrounding = [[-2,0], [-1,0], [1,0], [2,0], [0,-2], [0,-1], [0,1], [0,2]];
+var blocks = [];
+
 //initialization operation
 function init(){
+	gameStop =true;
+	blocks = [];
+	previousLiveCells = [];
+	currentLiveCells = [];
+	changedCells = [];
+	$('#layout3').prop('onclick',null).off('click');
+	$('#layout3').click(changeCellStatus);
+	refreshParams();
 	for (var i = 0; i < realWidth; i++){
 		map[i] = new Array(realHeight);
 		for (var j = 0; j < realHeight; j++){
 			map[i][j] = 0;
 		}
 	}
+	//clear before drawing
+	$('#cells')[0].getContext("2d").clearRect(0,0, width*miniMapScale, height*miniMapScale);
+	$('#blocks')[0].getContext("2d").clearRect(0,0, width*miniMapScale, height*miniMapScale);
+
 	drawInitMap();
 	adjustScreen();
-
-	var speed = $('#speed');
-	timeout = 1000 - parseInt(speed.val());
-	speed.on('change', speedListener);
-	speed.on('input', speedListener);
 }
 
-//Listener to start/stop
-function control(){
-	if(gameStop === true){
+//Listener to start
+function start(){
+	if (gameStop == true){
+		$('#layout3').prop('onclick',null).off('click');
+		//$('#layout3').click(function(){});
 		gameStop = false;
+		randomProduction();
+		drawCells();
 		gameCycle();
-		$('#control').html('Stop');
-	}else{
-		gameStop = true;
-		$('#control').html('Start');
 	}
 }
 
-//kill all cells
-function clearCells(){
-	for (var i = 0; i < realWidth; i++){
-		for (var j = 0; j < realHeight; j++){
-			map[i][j] = 0;
+function randomProduction(){
+	for(var i = 0; i < width; i++){
+		for (var j = 0; j < height; j++){
+			var x = i+margin;
+			var y = j+margin;
+			if(map[x][y] != 0){
+				continue;
+			}else if (Math.random() < liveProbability){
+				map[x][y] = 8;
+				previousLiveCells[previousLiveCells.length] = [x,y];
+			}
 		}
 	}
-	previousLiveCells.splice(0, previousLiveCells.length);
-	drawCells();	
+	//console.log(previousLiveCells.length/width/height);
+}
+
+//Listener to refresh
+function refreshParams(){
+	//some changeble setting
+	var speed = $('#speed');
+	timeout = 1000 - parseInt(speed.val());
+	var probability = $('#probability');
+	liveProbability = parseFloat(probability.val());
+	var scale = $('#scale');
+	width = parseInt(scale.val());
+	height = parseInt(width/5*3);
+	realWidth = width+2*margin;
+	realHeight = height+2*margin;
+	miniMapScale = 750/width;
 }
 
 /*
@@ -74,7 +106,7 @@ function updateMap(){
 	for (var i = 0; i < length; i++){
 		var x = previousLiveCells[i][0];
 		var y = previousLiveCells[i][1];
-		nineCellCases(x, y);
+		updateCell(x, y);
 	}
 	var clength = changedCells.length;
 	for (var i = 0; i < clength; i++){
@@ -82,89 +114,45 @@ function updateMap(){
 	}
 }
 
-//9 different cell's position cases
-//considering condition is different at the border
-function nineCellCases(x, y){
-	switch(x){
-	case 0:
-		switch(y){
-		case 0: // 1
-			updateCell([[1, 0], [0, 1], [1, 1]], x, y);
-			break;
-		case realHeight-1: // 2
-			updateCell([[1, 0], [0, -1], [1, -1]], x, y);
-			break;
-		default: // 3
-			updateCell([[0, -1], [1, -1], [1, 0], [1, 1], [0, 1]], x, y);
-			break;
-		}
-		break;
-	case realWidth-1:
-		switch(y){
-		case 0: // 4
-			updateCell([[-1, 0], [-1, 1], [0, 1]], x, y);
-			break;
-		case realHeight-1: // 5
-			updateCell([[-1, 0], [-1, -1], [0, -1]], x, y);
-			break;
-		default: // 6
-			updateCell([[0, -1], [-1, -1], [-1, 0], [-1, 1], [0, 1]], x, y);
-			break;
-		}
-		break;
-	default:
-		switch(y){
-		case 0: // 7
-			updateCell([[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0]], x, y);
-			break;
-		case realHeight-1: // 8
-			updateCell([[-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0]], x, y);
-			break;
-		default: // 9
-			updateCell([[-1,-1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]], x, y);
-			break;
-		}
-		break;
-	}
-}
-
 //counting living cells around cell (x,y) and decide 
 //whether it's dead or alive in next round
-function updateCell(surround, x, y){
-	var length = surround.length;
+function updateCell(x, y){
 	var sum = 0;
-	var state =  map[x][y];
-	for (var i = 0; i < length; i++){
-		sum += map[x+surround[i][0]][y+surround[i][1]];
-		if (map[x][y] == 1){
-			if (map[x+surround[i][0]][y+surround[i][1]] == 0){
-				nineCellCases(x+surround[i][0], y+surround[i][1]);
+	var status =  map[x][y];
+	for (var i = 0; i < 8; i++){
+		var nx = x+surrounding[i][0];
+		var ny = y+surrounding[i][1];
+		if (nx < 0 || nx > realWidth || ny < 0 || ny > realHeight){
+			continue;
+		}else{
+			sum += map[nx][ny];
+			if (status == 8){
+				if (map[nx][ny] == 0){
+					updateCell(nx, ny);
+				}
 			}
 		}
 	}
-	switch(sum){
-	case 3:
-		if (state == 0){
+	if (sum >= 32 || sum < 16){ // more than 3 cells or less than 2 cells around
+		if (status == 8){
+			changedCells[changedCells.length] = [x, y];
+		}
+	}else if (sum >= 24){ // 3*8, three cells around
+		if (status == 0){
 			if (multiDimArraySearch(x,y,currentLiveCells) == -1){
 				currentLiveCells[currentLiveCells.length] = [x, y];
 			}
 		}else{
 			currentLiveCells[currentLiveCells.length] = [x, y];
 		}
-		if (state == 0){
+
+		if (status == 0){
 			changedCells[changedCells.length] = [x, y];
 		}
-		break;
-	case 2:
-		if (state == 1){
+	}else if (sum >= 16){
+		if (status == 8){
 			currentLiveCells[currentLiveCells.length] = [x, y];
 		}
-		break;
-	default:
-		if (state == 1){
-			changedCells[changedCells.length] = [x, y];
-		}
-		break;
 	}
 }
 
@@ -209,21 +197,38 @@ function drawCells(){
 	}
 }
 
+function drawBlocks(){
+	var canvasblock = $('#blocks')[0];
+	canvasblock.width = width * miniMapScale + 1;	
+	canvasblock.height = height * miniMapScale + 1;
+	var cxt = canvasblock.getContext("2d");
+	cxt.fillStyle = "rgb(0,0,0)";
+	var length = blocks.length;
+	for (var i = 0; i < length; i++){
+		cxt.fillRect(
+			(blocks[i][0]) * miniMapScale+1,
+			(blocks[i][1]) * miniMapScale+1,
+			miniMapScale-2,miniMapScale-2
+		);
+	}
+}
+
 //listener on the mouse click event and changing the status of a cell
-function changeCellStatus(){
-	var e=arguments[0]||window.event;
-    var x = parseInt((e.pageX - $('#layout2').offset().left)/miniMapScale)+margin;
-	var y = parseInt((e.pageY - $('#layout2').offset().top)/miniMapScale)+margin;
+function changeCellStatus(e){
+	//var e=arguments[0]||window.event;
+    var x = parseInt((e.pageX - $('#layout2').offset().left)/miniMapScale);
+	var y = parseInt((e.pageY - $('#layout2').offset().top)/miniMapScale);
+	//console.log(x + ' ' + y);
 	if (map[x][y] == 0){
-		previousLiveCells[previousLiveCells.length] = [x, y];
+		blocks[blocks.length] = [x, y];
 	}else{
-		var index = multiDimArraySearch(x,y, previousLiveCells);
+		var index = multiDimArraySearch(x,y, blocks);
         if (index > -1) {
-        	previousLiveCells.splice(index, 1);
+        	blocks.splice(index, 1);
         }
 	}
 	map[x][y] = 1 - map[x][y];
-	drawCells();
+	drawBlocks();
 }
 
 //search an item in a two D array
@@ -242,6 +247,7 @@ function multiDimArraySearch(x, y, a){
 function adjustScreen(){
 	var layout1 = $("#layout1");
 	var layout2 = $("#layout2");
+	var layout3 = $("#layout3");
 	var left = 	(document.body.clientWidth - width * miniMapScale - 1) / 2;
 	var titleLeft = (document.body.clientWidth - 380 - 1) / 2;
 	var top = "15%";
@@ -249,15 +255,11 @@ function adjustScreen(){
 	layout1.css("top", top);
 	layout2.css("left", left+"px");
 	layout2.css("top", top);
+	layout3.css("left", left+"px");
+	layout3.css("top", top);
 	$('#title').css('left', titleLeft);
 	$('#title').css('top', "3%");
 	var tops = window.screen.height * 1;
 }
 
 window.onresize = adjustScreen;
-
-//listener on the speed dial and setting the time interval
-function speedListener(){
-	var speed = $('#speed');
-	timeout = 1000 - parseInt(speed.val());
-}

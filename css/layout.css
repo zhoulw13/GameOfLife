@@ -5,9 +5,15 @@
 #layout1{
 	position:absolute;
 }
+
 #layout2{
 	position:absolute;
 	z-index:10;
+}
+
+#layout3{
+	position:absolute;
+	z-index:11;
 }
 
 

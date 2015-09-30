@@ -10,19 +10,26 @@
 	</head>
 	<body>
 		<div id="title">
-			<img src="title.JPG">
+			<img src="images/title.JPG">
 		</div>
 		<div id="layout1">
 			<canvas id="minimap"></canvas>
 			<div id = "buttonList" style = "margin-top:2%">
-				<button id="control" style = "margin-top:0;margin-left:10%; height:30px; width:50px" onclick = "control();">Start</button>
-				<button id="clear" style = "margin-left:10%; height:30px; width:50px" onclick = "clearCells();">Clear</button>
-				<img src="speeddial.svg" alt="" width="20px" height="20px" style = "margin-left:10%">
-				<input id="speed" type="range" min="300" max="990" step="100" value="49" style = "margin-left:1%">
+				<button id="start" style = "margin-top:0;margin-left:1%; height:30px; width:60px" onclick = "start();">Start</button>
+				<button id="refresh" style = "margin-top:0;margin-left:1%; height:30px; width:60px" onclick = "init();">Refresh</button>
+				<img src="images/speeddial.svg" alt="" width="20px" height="20px" style = "margin-left:4%">
+				<input id="speed" width="10px" type="range" min="200" max="990" step="100" value="49" style = "margin-left:0%">
+				<img src="images/density.png" alt="" width="20px" height="20px" style = "margin-left:4%">
+				<input id="probability" type="range" min="0" max="1" step="0.1" value="0.2" style = "margin-left:0%">
+				<img src="images/grid.svg" alt="" width="20px" height="20px" style = "margin-left:4%">
+				<input id="scale" type="range" min="50" max="100" step="10" value="50" style = "margin-left:0%">
 			</div>
 		</div>
-		<div id="layout2" onclick = "changeCellStatus();">
+		<div id="layout2">
 			<canvas id="cells"></canvas>
+		</div>
+		<div id="layout3">
+			<canvas id="blocks"></canvas>
 		</div>
 	</body>
 	<script type="text/javascript">
