@@ -53,6 +53,7 @@ function start(){
 	}
 }
 
+//randomly set cell's initiation status respect the density
 function randomProduction(){
 	for(var i = 0; i < width; i++){
 		for (var j = 0; j < height; j++){
@@ -119,6 +120,9 @@ function updateMap(){
 function updateCell(x, y){
 	var sum = 0;
 	var status =  map[x][y];
+
+	//compute living cells around this cell
+	//and add dead cells around to test whether they will be alive
 	for (var i = 0; i < 8; i++){
 		var nx = x+surrounding[i][0];
 		var ny = y+surrounding[i][1];
@@ -149,7 +153,7 @@ function updateCell(x, y){
 		if (status == 0){
 			changedCells[changedCells.length] = [x, y];
 		}
-	}else if (sum >= 16){
+	}else if (sum >= 16){ // two cells around
 		if (status == 8){
 			currentLiveCells[currentLiveCells.length] = [x, y];
 		}
@@ -197,6 +201,7 @@ function drawCells(){
 	}
 }
 
+//draw blocks again at every click on the map
 function drawBlocks(){
 	var canvasblock = $('#blocks')[0];
 	canvasblock.width = width * miniMapScale + 1;	
