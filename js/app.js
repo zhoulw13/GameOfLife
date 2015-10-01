@@ -1,4 +1,5 @@
 //some global variable
+"use strict";
 var timeout = 200;
 var miniMapScale = 15;
 var width = 50;
@@ -8,7 +9,7 @@ var realWidth = width+2*margin;
 var realHeight = height+2*margin;
 var map = new Array(realWidth);
 var previousLiveCells = [];
-var currentLiveCells = []
+var currentLiveCells = [];
 var changedCells = [];
 var gameStop = true;
 
@@ -43,7 +44,7 @@ function init(){
 
 //Listener to start
 function start(){
-	if (gameStop == true){
+	if (gameStop === true){
 		$('#layout3').prop('onclick',null).off('click');
 		//$('#layout3').click(function(){});
 		gameStop = false;
@@ -59,7 +60,7 @@ function randomProduction(){
 		for (var j = 0; j < height; j++){
 			var x = i+margin;
 			var y = j+margin;
-			if(map[x][y] != 0){
+			if(map[x][y] !== 0){
 				continue;
 			}else if (Math.random() < liveProbability){
 				map[x][y] = 8;
@@ -110,8 +111,8 @@ function updateMap(){
 		updateCell(x, y);
 	}
 	var clength = changedCells.length;
-	for (var i = 0; i < clength; i++){
-		map[changedCells[i][0]][changedCells[i][1]] = 1 - map[changedCells[i][0]][changedCells[i][1]];
+	for (i = 0; i < clength; i++){
+		map[changedCells[i][0]][changedCells[i][1]] = 8 - map[changedCells[i][0]][changedCells[i][1]];
 	}
 }
 
@@ -131,7 +132,7 @@ function updateCell(x, y){
 		}else{
 			sum += map[nx][ny];
 			if (status == 8){
-				if (map[nx][ny] == 0){
+				if (map[nx][ny] === 0){
 					updateCell(nx, ny);
 				}
 			}
@@ -142,16 +143,13 @@ function updateCell(x, y){
 			changedCells[changedCells.length] = [x, y];
 		}
 	}else if (sum >= 24){ // 3*8, three cells around
-		if (status == 0){
+		if (status === 0){
 			if (multiDimArraySearch(x,y,currentLiveCells) == -1){
 				currentLiveCells[currentLiveCells.length] = [x, y];
+				changedCells[changedCells.length] = [x, y];
 			}
 		}else{
 			currentLiveCells[currentLiveCells.length] = [x, y];
-		}
-
-		if (status == 0){
-			changedCells[changedCells.length] = [x, y];
 		}
 	}else if (sum >= 16){ // two cells around
 		if (status == 8){
@@ -165,6 +163,15 @@ function drawInitMap(){
 	var miniMap = $("#minimap")[0];
 	miniMap.width = width * miniMapScale + 1;
 	miniMap.height = height * miniMapScale + 1;
+
+	var cells = $('#cells')[0];
+	cells.width = width * miniMapScale + 1;	
+	cells.height = height * miniMapScale + 1;
+	
+	var canvasblock = $('#blocks')[0];
+	canvasblock.width = width * miniMapScale + 1;	
+	canvasblock.height = height * miniMapScale + 1;
+
 	var cxt = miniMap.getContext("2d");
 	cxt.strokeStyle = "rgba(200,200,200,1)";
 	for (var x=0;x<=width;x++) {
@@ -196,7 +203,7 @@ function drawCells(){
 			);
 		}
 	}
-	if (length == 0){
+	if (length === 0){
 		cxt.clearRect(0,0, width*miniMapScale, height*miniMapScale);
 	}
 }
@@ -224,7 +231,7 @@ function changeCellStatus(e){
     var x = parseInt((e.pageX - $('#layout2').offset().left)/miniMapScale);
 	var y = parseInt((e.pageY - $('#layout2').offset().top)/miniMapScale);
 	//console.log(x + ' ' + y);
-	if (map[x][y] == 0){
+	if (map[x][y] === 0){
 		blocks[blocks.length] = [x, y];
 	}else{
 		var index = multiDimArraySearch(x,y, blocks);
